@@ -62,7 +62,7 @@ int main(){
       C[i] = 0.0;
     }
 
-    int num_trials = 5;
+    int num_trials = 10;
 
     // Measure performance
     high_resolution_clock::time_point start = high_resolution_clock::now();
