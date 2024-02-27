@@ -45,7 +45,7 @@ void matmul_blocked(const int n, double* C, double* A, double* B){
 
 int main(){
 
-  for (int i = 4; i < 10; ++i) {
+  for (int i = 4; i <= 10; ++i) {
     int n = pow(2,i);
     cout << "Matrix size n = " << n << ", block size = " << BLOCK_SIZE << endl;
     
