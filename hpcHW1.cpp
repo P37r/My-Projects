@@ -441,7 +441,7 @@ void RMM(Matrix* C, Matrix* A, Matrix* B, std::tuple<int, int> A_idx, std::tuple
 
 
 int main() {
-    int n = 256;
+    int n = 512;
 
     Matrix *A = new Matrix(n, std::vector<int>(n, 0));
     Matrix *B = new Matrix(n, std::vector<int>(n, 0));
@@ -464,7 +464,7 @@ int main() {
 
    
     int num_trials = 10;
-    for (int blockSizeExp = 1; blockSizeExp <= 8; ++blockSizeExp) {
+    for (int blockSizeExp = 1; blockSizeExp <= 9; ++blockSizeExp) {
         std::cout << "ice spice ";
         int block_n = pow(2, blockSizeExp);
         double total_elapsed_time = 0;
