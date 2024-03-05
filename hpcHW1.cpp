@@ -23,6 +23,7 @@ void RMM(Matrix* C, Matrix* A, Matrix* B, std::tuple<int, int> A_idx, std::tuple
     int B_adjust_i = std::get<0>(B_idx);
     int B_adjust_j = std::get<1>(B_idx);
 
+
     if (n == block_n) {
         // Perform multiplication
         for (int i = 0; i < block_n; ++i) {
@@ -269,62 +270,106 @@ int main() {
 
     
 
-    int n = 1024;
+    // int n = 1024;
 
-    Matrix *A = new Matrix(n, std::vector<int>(n, 0));
-    Matrix *B = new Matrix(n, std::vector<int>(n, 0));
-    Matrix *C = new Matrix(n, std::vector<int>(n, 0));
+    // Matrix *A = new Matrix(n, std::vector<int>(n, 0));
+    // Matrix *B = new Matrix(n, std::vector<int>(n, 0));
+    // Matrix *C = new Matrix(n, std::vector<int>(n, 0));
 
     
-    // Iterate over the rows
-    for (int i = 0; i < n; ++i) {
-        // Iterate over the columns
-        for (int j = 0; j < n; ++j) {
-            // Set the diagonal elements to 1
-            if (i == j) {
-            (*A)[i][j] = 1;
-            (*B)[i][j] = 1;
-            }
-        }
-    }
-// BLOCK SIZE TESTING
-    // int num_trials = 5;
-    // for (int blockSizeExp = 1; blockSizeExp <= log2(n); ++blockSizeExp) {
-    //     int block_n = pow(2, blockSizeExp);
-    //     double total_elapsed_time = 0;
-    //     for (int trial = 0; trial < num_trials; ++trial) {
-    //         high_resolution_clock::time_point start = high_resolution_clock::now();
-    //         // RMM(Matrix* C, Matrix* A, Matrix* B, std::tuple<int, int> A_idx, std::tuple<int, int> B_idx ,int n, int block_n)
-    //         RMM(C, A, B,std::make_tuple(0,0), std::make_tuple(0,0), n, block_n, std::make_tuple(0,0));
-    //         high_resolution_clock::time_point end = high_resolution_clock::now();
-    //         duration<double> elapsed = end - start;
-    //         total_elapsed_time += elapsed.count() * 1000; // Convert to milliseconds
+    // // Iterate over the rows
+    // for (int i = 0; i < n; ++i) {
+    //     // Iterate over the columns
+    //     for (int j = 0; j < n; ++j) {
+    //         // Set the diagonal elements to 1
+    //         if (i == j) {
+    //         (*A)[i][j] = 1;
+    //         (*B)[i][j] = 1;
+    //         }
     //     }
-    //     double avg_elapsed_time = total_elapsed_time / num_trials; // Average time
-    //     std::cout << "Computation time (ms) for block size " << block_n << " = " << avg_elapsed_time << "\n";
     // }
 
+    // int block_n = 64;
+    
+    // RMM(C, A, B,std::make_tuple(0,0), std::make_tuple(0,0), n, block_n, std::make_tuple(0,0));
 
-    int num_trials = 5;
-    for (int size = 1; size <= log2(n); ++size) {
-        int n = pow(2, size);
-        int block_n = 64;
 
-        if (n < block_n) {
-            block_n = n;
+    // for (int i = 0; i < n; ++i) {
+    //     for (int j = 0; j < n; ++j) {
+    //         if (j == i && (*C)[i][j] != 1) {
+    //             std::cout << "ERROR!";
+
+    //         }
+
+    //         if (j != i && (*C)[i][j] != 0) {
+    //             std::cout << "ERROR!";
+    //         }
+    //     }
+    // }
+
+    // std::cout << "finish!";
+
+
+// // BLOCK SIZE TESTING
+//     // int num_trials = 5;
+//     // for (int blockSizeExp = 1; blockSizeExp <= log2(n); ++blockSizeExp) {
+//     //     int block_n = pow(2, blockSizeExp);
+//     //     double total_elapsed_time = 0;
+//     //     for (int trial = 0; trial < num_trials; ++trial) {
+//     //         high_resolution_clock::time_point start = high_resolution_clock::now();
+//     //         // RMM(Matrix* C, Matrix* A, Matrix* B, std::tuple<int, int> A_idx, std::tuple<int, int> B_idx ,int n, int block_n)
+//     //         RMM(C, A, B,std::make_tuple(0,0), std::make_tuple(0,0), n, block_n, std::make_tuple(0,0));
+//     //         high_resolution_clock::time_point end = high_resolution_clock::now();
+//     //         duration<double> elapsed = end - start;
+//     //         total_elapsed_time += elapsed.count() * 1000; // Convert to milliseconds
+//     //     }
+//     //     double avg_elapsed_time = total_elapsed_time / num_trials; // Average time
+//     //     std::cout << "Computation time (ms) for block size " << block_n << " = " << avg_elapsed_time << "\n";
+//     // }
+
+    for (int n_pow = 1; n_pow <= 10; ++n_pow) {
+
+        int n = pow(2, n_pow);
+        std::cout << "Matrix Size: " << n << "\n";
+        Matrix *A = new Matrix(n, std::vector<int>(n, 0));
+        Matrix *B = new Matrix(n, std::vector<int>(n, 0));
+        Matrix *C = new Matrix(n, std::vector<int>(n, 0));
+
+
+        // Iterate over the rows
+        for (int i = 0; i < n; ++i) {
+            // Iterate over the columns
+            for (int j = 0; j < n; ++j) {
+                // Set the diagonal elements to 1
+                if (i==j) {
+                    (*A)[i][j] = 1;
+                    (*B)[i][j] = 1;
+                }
+            }
         }
-        double total_elapsed_time = 0;
-        for (int trial = 0; trial < num_trials; ++trial) {
-            high_resolution_clock::time_point start = high_resolution_clock::now();
-            // RMM(Matrix* C, Matrix* A, Matrix* B, std::tuple<int, int> A_idx, std::tuple<int, int> B_idx ,int n, int block_n)
-            RMM(C, A, B,std::make_tuple(0,0), std::make_tuple(0,0), n, block_n, std::make_tuple(0,0));
-            high_resolution_clock::time_point end = high_resolution_clock::now();
-            duration<double> elapsed = end - start;
-            total_elapsed_time += elapsed.count() * 1000; // Convert to milliseconds
+
+        int num_trials = 5;
+        for (int size = 1; size <= log2(n); ++size) {
+            int block_n= pow(2, size);
+
+            if (n < block_n) {
+                block_n = n;
+            }
+            double total_elapsed_time = 0;
+            for (int trial = 0; trial < num_trials; ++trial) {
+                high_resolution_clock::time_point start = high_resolution_clock::now();
+                RMM(C, A, B,std::make_tuple(0,0), std::make_tuple(0,0), n, block_n, std::make_tuple(0,0));
+                high_resolution_clock::time_point end = high_resolution_clock::now();
+                duration<double> elapsed = end - start;
+                total_elapsed_time += elapsed.count() * 1000; // Convert to milliseconds
+            }
+            double avg_elapsed_time = total_elapsed_time / num_trials; // Average time
+            std::cout << "Computation time (ms) for block size " << block_n << " = " << avg_elapsed_time << "\n";
         }
-        double avg_elapsed_time = total_elapsed_time / num_trials; // Average time
-        std::cout << "Computation time (ms) for matrix size " << n << " = " << avg_elapsed_time << "\n";
+
     }
+
+    
     return 0;
 
 }
