@@ -70,168 +70,6 @@ int RMM(Matrix* C, Matrix* A, Matrix* B, std::tuple<int, int> A_idx, std::tuple<
 }
 
 
-// void matrixAddition(Matrix* C, Matrix* A, Matrix* B, std::tuple<int, int> A_pos, std::tuple<int, int> B_pos, int n) {
-    
-//     int A_adjust_i = std::get<0>(A_pos);
-//     int A_adjust_j = std::get<1>(A_pos);
-//     int B_adjust_i = std::get<0>(B_pos);
-//     int B_adjust_j = std::get<1>(B_pos);
-
-
-    
-//     // Assuming Matrix is a struct containing a 2D array to store matrix elements
-//     for (int i = 0; i < n; ++i) {
-//         for (int j = 0; j < n; ++j) {
-//             (*C)[i][j] = (*A)[i+A_adjust_i][j+A_adjust_j] + (*B)[i+B_adjust_i][j + B_adjust_j];
-//         }
-//     }
-// }
-
-
-// void matrixSubtraction(Matrix* C, Matrix* A, Matrix* B, std::tuple<int, int> A_pos, std::tuple<int, int> B_pos, int n) {
-    
-//     int A_adjust_i = std::get<0>(A_pos);
-//     int A_adjust_j = std::get<1>(A_pos);
-//     int B_adjust_i = std::get<0>(B_pos);
-//     int B_adjust_j = std::get<1>(B_pos);
-
-
-    
-//     // Assuming Matrix is a struct containing a 2D array to store matrix elements
-//     for (int i = 0; i < n; ++i) {
-//         for (int j = 0; j < n; ++j) {
-//             (*C)[i][j] = (*A)[i+A_adjust_i][j+A_adjust_j] - (*B)[i+B_adjust_i][j + B_adjust_j];
-//         }
-//     }
-// }
-
-
-// void matrixSubtraction_C(Matrix* C, Matrix* A, int n, std::tuple<int, int> C_pos) {
-    
-//     int C_adjust_i = std::get<0>(C_pos);
-//     int C_adjust_j = std::get<1>(C_pos);
-
-//     // Assuming Matrix is a struct containing a 2D array to store matrix elements
-//     for (int i = 0; i < n; ++i) {
-//         for (int j = 0; j < n; ++j) {
-//             (*C)[i + C_adjust_i][j + C_adjust_j] -= (*A)[i][j];
-//         }
-//     }
-// }
-
-
-
-// void matrixAddition_C(Matrix* C, Matrix* A, Matrix* B, Matrix* D, int n, std::tuple<int, int> C_pos) {
-    
-    
-//     int C_adjust_i = std::get<0>(C_pos);
-//     int C_adjust_j = std::get<1>(C_pos);
-
-//     // Assuming Matrix is a struct containing a 2D array to store matrix elements
-//     for (int i = 0; i < n; ++i) {
-//         for (int j = 0; j < n; ++j) {
-//             (*C)[i + C_adjust_i][j + C_adjust_j] += (*A)[i][j] + (*B)[i][j] + (*D)[i][j];
-//         }
-//     }
-// }
-
-
-// void matrixAddition_C2(Matrix* C, Matrix* A, Matrix* B, int n, std::tuple<int, int> C_pos) {
-    
-    
-//     int C_adjust_i = std::get<0>(C_pos);
-//     int C_adjust_j = std::get<1>(C_pos);
-
-//     // Assuming Matrix is a struct containing a 2D array to store matrix elements
-//     for (int i = 0; i < n; ++i) {
-//         for (int j = 0; j < n; ++j) {
-//             (*C)[i + C_adjust_i][j + C_adjust_j] += (*A)[i][j] + (*B)[i][j] ;
-//         }
-//     }
-// }
-
-
-
-// void Strassen(Matrix* C, Matrix* A, Matrix* B,int n, int block_n, std::tuple<int, int> initial_i_j, int M_int, int recurse_lvl, Matrix* M1, Matrix* M2, Matrix* M3,Matrix* M4, Matrix* M5, Matrix* M6, Matrix* M7
-// ,Matrix* A11_A22, Matrix* B11_B22,Matrix* A21_A22, Matrix* B12_B22, Matrix* B21_B11, Matrix* A11_A12, Matrix* A21_A11, Matrix* B11_B12, Matrix* A12_A22, Matrix* B21_B22) {
-//     std::cout << "M_int: "<< M_int << ""<<"recurse_lvl: " << recurse_lvl << "\n";
-
-//     int halfSize = n / 2;
-
-//     auto topleft = std::make_tuple(0,0);
-//     auto topright = std::make_tuple(0,0 + halfSize);
-//     auto bottomleft = std::make_tuple(0 + halfSize,0);
-//     auto bottomright = std::make_tuple(0+ halfSize,0 + halfSize);
-
-//     matrixAddition(A11_A22, A,A, topleft, bottomright, n );
-//     matrixAddition(B11_B22, B,B, topleft, bottomright, n );
-
-//     matrixAddition(A21_A22, A,A, bottomleft, bottomright, n );
-//     matrixSubtraction(B12_B22, B,B, topright, bottomright, n );
-
-//     matrixSubtraction(B21_B11, B,B, bottomleft, topleft, n );
-
-//     matrixAddition(A11_A12, A,A, topleft, topright, n );
-//     matrixSubtraction(A21_A11, A,A, bottomleft, topleft, n );
-
-//     matrixAddition(B11_B12, B,B, topleft, topright, n );
-//     matrixSubtraction(A12_A22, A,A, topright, bottomright, n );
-//     matrixAddition(B21_B22, B,B, bottomleft, bottomright, n );
-
-//     if (n == block_n) {
-//         // Perform multiplication
-//         for (int i = 0; i < block_n; ++i) {
-//             for (int j = 0; j < block_n; ++j) {
-//                 for (int k = 0; k < block_n; ++k) {
-//                     (*C)[i][j] += (*A)[i][k]  * (*B)[k][j]; // Dereferencing pointers
-//                 }
-//             }
-//         }
-
-//     } 
-//     else {
-//         //    COO
-//        // M1
-//         Strassen(M1, A11_A22,B11_B22, halfSize, block_n, topleft, 1, recurse_lvl +1, M1, M2, M3, M4, M5, M6, M7, A11_A22, B11_B22, A21_A22, B12_B22, B21_B11, A11_A12, A21_A11, B11_B12, A12_A22, B21_B22);
-//         // M2
-//         Strassen(M2, A21_A22, B11, halfSize, block_n, topleft, 2, recurse_lvl +1, M1, M2, M3, M4, M5, M6, M7, A11_A22, B11_B22, A21_A22, B12_B22, B21_B11, A11_A12, A21_A11, B11_B12, A12_A22, B21_B22);
-//         // M3
-//         Strassen(M3, A_11, B12_B22, halfSize, block_n, topleft, 3, recurse_lvl +1, M1, M2, M3, M4, M5, M6, M7, A11_A22, B11_B22, A21_A22, B12_B22, B21_B11, A11_A12, A21_A11, B11_B12, A12_A22, B21_B22);
-//         // M4
-//         Strassen(M4, A22 ,B21_B11, halfSize, block_n, topleft, 4, recurse_lvl +1, M1, M2, M3, M4, M5, M6, M7, A21_A22, B11_B11, A21_A22, B12_B22, B21_B11, A11_A12, A21_A11, B11_B12, A12_A22, B21_B22);
-//         // M5
-//         Strassen(M5, A11_A12, B22, halfSize, block_n, topleft, 5, recurse_lvl +1, M1, M2, M3, M4, M5, M6, M7, A11_A11, B11_B12, A21_A22, B12_B22, B21_B11, A11_A12, A21_A11, B11_B12, A12_A22, B21_B22);
-//         // M6
-//         Strassen(M6, A21_A11, B11_B12, halfSize, block_n, topleft, 6, recurse_lvl +1, M1, M2, M3, M4, M5, M6, M7, A11_A11, B11_B12, A21_A22, B12_B22, B21_B11, A11_A12, A21_A11, B11_B12, A12_A22, B21_B22);
-//         // M7
-//         Strassen(M7, A12_A22,B21_B22, halfSize, block_n, topleft, 7, recurse_lvl +1, M1, M2, M3, M4, M5, M6, M7, A12_A22, B21_B22, A21_A22, B12_B22, B21_B11, A11_A12, A21_A11, B11_B12, A12_A22, B21_B22);
-        
-
-        
-
-
-// // matrixAddition_C(Matrix* C, Matrix* A, Matrix* B, Matrix* D, int n, std::tuple<int, int> C_pos)
-//     //    C00
-//         matrixAddition_C(C, M1,  M4, M7, halfSize, topleft);
-//         matrixSubtraction_C(C, M5, halfSize, topleft);
-
-
-
-// // C01
-//         matrixAddition_C2(C, M3,  M5, halfSize, topright);
-
-
-// // C10
-//         matrixAddition_C2(C, M2,  M4, halfSize, bottomleft);
-
-
-// // C11
-//         matrixAddition_C(C, M1,  M3, M6, halfSize, bottomright);
-//         matrixSubtraction_C(C, M2, halfSize, bottomright);
-//     }
-// }
-        
-
 
 
 
@@ -315,7 +153,7 @@ int main() {
             }
         }
 
-        int num_trials = 5;
+        int num_trials = 30;
         for (int size = 1; size <= log2(n); ++size) {
             int block_n= pow(2, size);
 
@@ -347,7 +185,7 @@ int main() {
     // Run RMM Timings
     
     int number = 1024;
-    int num_trials = 5;
+    int num_trials = 30;
     for (int size = 1; size <= log2(number); ++size) {
         int block_n_opt = 64;
 
