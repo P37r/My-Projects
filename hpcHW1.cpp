@@ -349,9 +349,10 @@ int main() {
     // Run RMM Timings
     
     int number = 1024;
-    int block_n = 64;
     int num_trials = 5;
     for (int size = 1; size <= log2(number); ++size) {
+        int block_n_opt = 64;
+
         int n = pow(2,size);
         std::cout << "Matrix Size: " << n << "\n";
         Matrix *A = new Matrix(n, std::vector<int>(n, 0));
@@ -371,19 +372,19 @@ int main() {
             }
         }
 
-        if (n < block_n) {
-            block_n = n;
+        if (n < block_n_opt) {
+            block_n_opt = n;
         }
         double total_elapsed_time = 0;
         for (int trial = 0; trial < num_trials; ++trial) {
             high_resolution_clock::time_point start = high_resolution_clock::now();
-            RMM(C, A, B,std::make_tuple(0,0), std::make_tuple(0,0), n, block_n, std::make_tuple(0,0));
+            RMM(C, A, B,std::make_tuple(0,0), std::make_tuple(0,0), n, block_n_opt, std::make_tuple(0,0));
             high_resolution_clock::time_point end = high_resolution_clock::now();
             duration<double> elapsed = end - start;
             total_elapsed_time += elapsed.count() * 1000; // Convert to milliseconds
         }
         double avg_elapsed_time = total_elapsed_time / num_trials; // Average time
-        std::cout << "Computation time (ms) for block size " << block_n << " = " << avg_elapsed_time << "\n";
+        std::cout << "Computation time (ms) for block size " << block_n_opt << " = " << avg_elapsed_time << "\n";
     }
 
 
