@@ -239,94 +239,63 @@ void RMM(Matrix* C, Matrix* A, Matrix* B, std::tuple<int, int> A_idx, std::tuple
 
 
 int main() {
+    std::cout << "____________________________________________ \n";
 
-    // int n = 8;
-
-    // Matrix *A = new Matrix(n, std::vector<int>(n, 0));
-    // Matrix *B = new Matrix(n, std::vector<int>(n, 0));
-    // Matrix *C = new Matrix(n, std::vector<int>(n, 0));
-
-    
-    // // Iterate over the rows
-    // for (int i = 0; i < n; ++i) {
-    //     // Iterate over the columns
-    //     for (int j = 0; j < n; ++j) {
-    //         // Set the diagonal elements to 1
-    //         if (i==j) {
-    //             (*A)[i][j] = 1;
-    //             (*B)[i][j] = 1;
-    //         }
-    //     }
-    // }
+    std::cout << "Verify RMM Correctness \n";
+    std::cout << "____________________________________________ \n";
+    std::cout << " \n";
 
 
-    // int block_n = 2;
-    // Strassen(C, A, B,std::make_tuple(0,0), std::make_tuple(0,0),std::make_tuple(0,0), std::make_tuple(0,0), n, block_n, std::make_tuple(0,0),0,0, 1);
-    // std::cout << "C:\n";
-    // for (const auto& row : (*C)) {
-    //     for (int val : row) {
-    //         std::cout << val << " ";}
-    //         std::cout << "\n";}
+// Verify RMM Correctness
+    int n = 1024;
+
+    Matrix *A = new Matrix(n, std::vector<int>(n, 0));
+    Matrix *B = new Matrix(n, std::vector<int>(n, 0));
+    Matrix *C = new Matrix(n, std::vector<int>(n, 0));
 
     
+    // Iterate over the rows
+    for (int i = 0; i < n; ++i) {
+        // Iterate over the columns
+        for (int j = 0; j < n; ++j) {
+            // Set the diagonal elements to 1
+            if (i == j) {
+            (*A)[i][j] = 1;
+            (*B)[i][j] = 1;
+            }
+        }
+    }
 
-    // int n = 1024;
-
-    // Matrix *A = new Matrix(n, std::vector<int>(n, 0));
-    // Matrix *B = new Matrix(n, std::vector<int>(n, 0));
-    // Matrix *C = new Matrix(n, std::vector<int>(n, 0));
-
+    int block_n = 2;
     
-    // // Iterate over the rows
-    // for (int i = 0; i < n; ++i) {
-    //     // Iterate over the columns
-    //     for (int j = 0; j < n; ++j) {
-    //         // Set the diagonal elements to 1
-    //         if (i == j) {
-    //         (*A)[i][j] = 1;
-    //         (*B)[i][j] = 1;
-    //         }
-    //     }
-    // }
-
-    // int block_n = 64;
-    
-    // RMM(C, A, B,std::make_tuple(0,0), std::make_tuple(0,0), n, block_n, std::make_tuple(0,0));
+    RMM(C, A, B,std::make_tuple(0,0), std::make_tuple(0,0), n, block_n, std::make_tuple(0,0));
 
 
-    // for (int i = 0; i < n; ++i) {
-    //     for (int j = 0; j < n; ++j) {
-    //         if (j == i && (*C)[i][j] != 1) {
-    //             std::cout << "ERROR!";
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if (j == i && (*C)[i][j] != 1) {
+                std::cout << "ERROR!";
 
-    //         }
+            }
 
-    //         if (j != i && (*C)[i][j] != 0) {
-    //             std::cout << "ERROR!";
-    //         }
-    //     }
-    // }
+            if (j != i && (*C)[i][j] != 0) {
+                std::cout << "ERROR!";
+            }
+        }
+    }
 
-    // std::cout << "finish!";
+    std::cout << "If there are no 'ERRORS!', then the program has run successfully! \n";
+    std::cout << " \n";
+
+    std::cout << "____________________________________________ \n";
+    std::cout << " Running RMM for different matrix sizes and block sizes \n";
+
+    std::cout << "____________________________________________ \n";
+    std::cout << " \n";
 
 
-// // BLOCK SIZE TESTING
-//     // int num_trials = 5;
-//     // for (int blockSizeExp = 1; blockSizeExp <= log2(n); ++blockSizeExp) {
-//     //     int block_n = pow(2, blockSizeExp);
-//     //     double total_elapsed_time = 0;
-//     //     for (int trial = 0; trial < num_trials; ++trial) {
-//     //         high_resolution_clock::time_point start = high_resolution_clock::now();
-//     //         // RMM(Matrix* C, Matrix* A, Matrix* B, std::tuple<int, int> A_idx, std::tuple<int, int> B_idx ,int n, int block_n)
-//     //         RMM(C, A, B,std::make_tuple(0,0), std::make_tuple(0,0), n, block_n, std::make_tuple(0,0));
-//     //         high_resolution_clock::time_point end = high_resolution_clock::now();
-//     //         duration<double> elapsed = end - start;
-//     //         total_elapsed_time += elapsed.count() * 1000; // Convert to milliseconds
-//     //     }
-//     //     double avg_elapsed_time = total_elapsed_time / num_trials; // Average time
-//     //     std::cout << "Computation time (ms) for block size " << block_n << " = " << avg_elapsed_time << "\n";
-//     // }
 
+// Running RMM for different matrix sizes and block sizes
     for (int n_pow = 1; n_pow <= 10; ++n_pow) {
 
         int n = pow(2, n_pow);
@@ -369,7 +338,56 @@ int main() {
 
     }
 
+    std::cout << " \n";
+
+    std::cout << "____________________________________________ \n";
+    std::cout << "Run TMM Timings \n";
+    std::cout << "____________________________________________ \n";
+
+    std::cout << " \n";
+
+    // Run RMM Timings
     
+    int number = 1024;
+    int block_n = 64;
+    int num_trials = 5;
+    for (int size = 1; size <= log2(number); ++size) {
+        int n = pow(2,size);
+        std::cout << "Matrix Size: " << n << "\n";
+        Matrix *A = new Matrix(n, std::vector<int>(n, 0));
+        Matrix *B = new Matrix(n, std::vector<int>(n, 0));
+        Matrix *C = new Matrix(n, std::vector<int>(n, 0));
+
+
+        // Iterate over the rows
+        for (int i = 0; i < n; ++i) {
+            // Iterate over the columns
+            for (int j = 0; j < n; ++j) {
+                // Set the diagonal elements to 1
+                if (i==j) {
+                    (*A)[i][j] = 1;
+                    (*B)[i][j] = 1;
+                }
+            }
+        }
+
+        if (n < block_n) {
+            block_n = n;
+        }
+        double total_elapsed_time = 0;
+        for (int trial = 0; trial < num_trials; ++trial) {
+            high_resolution_clock::time_point start = high_resolution_clock::now();
+            RMM(C, A, B,std::make_tuple(0,0), std::make_tuple(0,0), n, block_n, std::make_tuple(0,0));
+            high_resolution_clock::time_point end = high_resolution_clock::now();
+            duration<double> elapsed = end - start;
+            total_elapsed_time += elapsed.count() * 1000; // Convert to milliseconds
+        }
+        double avg_elapsed_time = total_elapsed_time / num_trials; // Average time
+        std::cout << "Computation time (ms) for block size " << block_n << " = " << avg_elapsed_time << "\n";
+    }
+
+
+
     return 0;
 
 }
