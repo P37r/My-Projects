@@ -43,7 +43,7 @@ void matmul_blocked(const int n, double* C, double* A, double* B, int BLOCK_SIZE
 }
 
 int main(){
-  int num_trials = 5;
+  int num_trials = 30;
 
   for (int i = 4; i <=10; ++i) {
     int n = pow(2,i);
