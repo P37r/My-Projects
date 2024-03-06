@@ -9,10 +9,7 @@ using namespace std::chrono;
 // Define a type for matrices
 using Matrix = std::vector<std::vector<int>>;
 
-int number = 0;
-
-
-void RMM(Matrix* C, Matrix* A, Matrix* B, std::tuple<int, int> A_idx, std::tuple<int, int> B_idx ,int n, int block_n, std::tuple<int, int> initial_i_j) {
+int RMM(Matrix* C, Matrix* A, Matrix* B, std::tuple<int, int> A_idx, std::tuple<int, int> B_idx ,int n, int block_n, std::tuple<int, int> initial_i_j) {
     int halfSize = n / 2;
     int C_adjust_i = std::get<0>(initial_i_j);
     int C_adjust_j = std::get<1>(initial_i_j);
@@ -69,6 +66,7 @@ void RMM(Matrix* C, Matrix* A, Matrix* B, std::tuple<int, int> A_idx, std::tuple
         RMM(C, A,B, Abottomleft, Btopright, halfSize, block_n, Cbottomright);
         RMM(C, A,B, Abottomright, Bbottomright, halfSize, block_n, Cbottomright);
     }
+    return 0;
 }
 
 
