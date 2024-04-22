@@ -16,11 +16,11 @@ __global__ void partial_reduction(const int N, float *x_reduced, const float *x)
   // coalesced reads in
   s_x[tid] = 0.f;
   if (i < N){
-    s_x[tid] = x[i]; + x[i + blockDim.x];
+    s_x[tid] = x[i] + x[i + blockDim.x];
   }
 
   // number of "live" threads per block
-  int alive = blockDim.x;
+  int alive = blockDim.x/2;
   
   while (alive > 1){
     __syncthreads(); 
