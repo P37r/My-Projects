@@ -26,7 +26,6 @@ __global__ void partial_reduction(const int N, float *x_reduced, const float *x)
 
   // number of "live" threads per block
   int alive = blockDim.x /2;
-  std::cout << "alive num" << alive;
 
   
   while (alive > 1){
