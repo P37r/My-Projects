@@ -264,21 +264,21 @@ int main(int argc, char * argv[]){
 
                                                                                         // Version 2
     // allocate memory and copy to the GPU
-    float * d_x;
-    float * d_x_reduced;  
+    float * d_x2;
+    float * d_x_reduced2;  
     int size_x = N * sizeof(float);
     int size_x_reduced = numBlocks * sizeof(float);
-    cudaMalloc((void **) &d_x, size_x);
-    cudaMalloc((void **) &d_x_reduced, size_x_reduced);
+    cudaMalloc((void **) &d_x2, size_x);
+    cudaMalloc((void **) &d_x_reduced2, size_x_reduced);
     
     // copy memory over to the GPU
-    cudaMemcpy(d_x, x, size_x, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_x_reduced, x_reduced, size_x_reduced, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_x2, x, size_x, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_x_reduced2, x_reduced, size_x_reduced, cudaMemcpyHostToDevice);
 
-    partial_reduction2 <<< numBlocks, blockSize >>> (N, d_x_reduced, d_x);
+    partial_reduction2 <<< numBlocks, blockSize >>> (N, d_x_reduced2, d_x2);
 
     // copy memory back to the CPU
-    cudaMemcpy(x_reduced, d_x_reduced, size_x_reduced, cudaMemcpyDeviceToHost);
+    cudaMemcpy(x_reduced, d_x_reduced2, size_x_reduced, cudaMemcpyDeviceToHost);
 
     float sum_x = 0.f;
     for (int i = 0; i < numBlocks; ++i){
@@ -298,7 +298,7 @@ int main(int argc, char * argv[]){
     cudaEventRecord(start, 0);
 
     for (int i = 0; i < num_trials; ++i){
-        partial_reduction2 <<< numBlocks, blockSize >>> (N, d_x_reduced, d_x);
+        partial_reduction2 <<< numBlocks, blockSize >>> (N, d_x_reduced2, d_x2);
     }
 
     cudaEventRecord(stop, 0);
