@@ -8,21 +8,62 @@
 #include <chrono>
 
 using namespace std::chrono;
+#define BLOCKSIZE 256
+
 
 __global__ void add(int N, const float *x, float *y){
   
-  int i = blockIdx.x * blockDim.x + threadIdx.x;  
-  if (i < N-1 && i > 0){
-    y[i] = -x[i+1] +2*x[i] - x[i-1];
+//   int i = blockIdx.x * blockDim.x + threadIdx.x;  
+//   if (i < N-1 && i > 0){
+//     y[i] = -x[i+1] +2*x[i] - x[i-1];
+//   }
+
+//   if (i==0){
+//     y[i] = -x[i+1] +2*x[i] - x[i];
+//   }
+
+//   if (i==N-1){
+//     y[i] = -x[i] +2*x[i] - x[i-1];
+//   }
+
+
+  __shared__ float s_x[BLOCKSIZE+2];
+
+  const int i = blockDim.x * blockIdx.x + threadIdx.x;
+  const int tid = threadIdx.x;
+  
+  // coalesced reads in
+  s_x[tid] = 0.f;
+  
+  
+  if (i < N){
+    if (tid <blockDim.x + 1) {
+        s_x[tid] = x[i-1];
+    }
+    if (tid == blockDim.x + 1) {
+        s_x[tid] = x[i];
+    }
   }
 
-  if (i==0){
-    y[i] = -x[i+1] +2*x[i] - x[i];
-  }
+  // number of "live" threads per block
+  int alive = blockDim.x;
+  
 
-  if (i==N-1){
-    y[i] = -x[i] +2*x[i] - x[i-1];
-  }
+  __syncthreads(); 
+                                             // I add +1 to the index so it adjusts for the shared memory, which has been shifted 1 unit
+  y[i]= s_x[tid + 1+1] + s_x[tid+1] - s_x[tid-1+1];
+}
+
+void printArray(const float* y, int N) {
+    std::cout << "[ ";
+    for (int i = 0; i < N; ++i) {
+        if (i == N - 1) {
+            std::cout << "y[" << i << "]";
+        } else {
+            std::cout << "y[" << i << "], ";
+        }
+    }
+    std::cout << " ]" << std::endl;
 }
 
 int main(void){
@@ -64,12 +105,13 @@ int main(void){
   // copy memory back to the CPU
   cudaMemcpy(y, d_y, size, cudaMemcpyDeviceToHost);
 
-//   for (int i = 0; i < N; ++i){
-//     if(y[i] != 0) {
-//         std::cout << "ERROR: Non Zero!";
-//     }
-//   }
-
+  for (int i = 0; i < N; ++i){
+    if(y[i] != 0) {
+        std::cout << "ERROR: Non Zero!";
+    }
+  }
+    std::cout << "\n";
+    printArray(y,N);
   return 0;
 }
 
