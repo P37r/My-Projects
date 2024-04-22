@@ -20,7 +20,7 @@ __global__ void partial_reduction(const int N, float *x_reduced, const float *x)
   }
 
   // number of "live" threads per block
-  int alive = blockDim.x/2;
+  int alive = blockDim.x;
   
   while (alive > 1){
     __syncthreads(); 
