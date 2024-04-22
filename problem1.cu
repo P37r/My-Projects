@@ -264,48 +264,46 @@ int main(int argc, char * argv[]){
 
                                                                                         // Version 2
     // allocate memory and copy to the GPU
+    float * x_reduced2 = new float[numBlocks];  
+
     float * d_x2;
     float * d_x_reduced2;  
-    int size_x = N * sizeof(float);
-    int size_x_reduced = numBlocks * sizeof(float);
     cudaMalloc((void **) &d_x2, size_x);
     cudaMalloc((void **) &d_x_reduced2, size_x_reduced);
     
     // copy memory over to the GPU
     cudaMemcpy(d_x2, x, size_x, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_x_reduced2, x_reduced, size_x_reduced, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_x_reduced2, x_reduced2, size_x_reduced, cudaMemcpyHostToDevice);
 
     partial_reduction2 <<< numBlocks, blockSize >>> (N, d_x_reduced2, d_x2);
 
     // copy memory back to the CPU
-    cudaMemcpy(x_reduced, d_x_reduced2, size_x_reduced, cudaMemcpyDeviceToHost);
+    cudaMemcpy(x_reduced2, d_x_reduced2, size_x_reduced, cudaMemcpyDeviceToHost);
 
-    float sum_x = 0.f;
+    float sum_x2 = 0.f;
     for (int i = 0; i < numBlocks; ++i){
-        sum_x += x_reduced[i];
+        sum_x2 += x_reduced2[i];
     }
 
     //  float target = N * (N+1) / 2.f;
-    float target = N;
-    printf("error = %f\n", fabs(sum_x - target));
-
+    printf("error = %f\n", fabs(sum_x2 - target));
     #if 1
-    int num_trials = 10;
-    float time;
-    cudaEvent_t start, stop;
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
-    cudaEventRecord(start, 0);
+    int num_trials2 = 10;
+    float time2;
+    cudaEvent_t start2, stop2;
+    cudaEventCreate(&start2);
+    cudaEventCreate(&stop2);
+    cudaEventRecord(start2, 0);
 
-    for (int i = 0; i < num_trials; ++i){
+    for (int i = 0; i < num_trials2; ++i){
         partial_reduction2 <<< numBlocks, blockSize >>> (N, d_x_reduced2, d_x2);
     }
 
-    cudaEventRecord(stop, 0);
-    cudaEventSynchronize(stop);
-    cudaEventElapsedTime(&time, start, stop);
+    cudaEventRecord(stop2, 0);
+    cudaEventSynchronize(stop2);
+    cudaEventElapsedTime(&time2, start2, stop2);
     
-    printf("Time to run kernel 10x: %6.2f ms.\n", time);
+    printf("Time to run kernel 10x: %6.2f ms.\n", time2);
     
     #endif
 
