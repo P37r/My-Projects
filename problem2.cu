@@ -51,7 +51,7 @@ __global__ void add(int N, const float *x, float *y){
 
   __syncthreads(); 
                                              // I add +1 to the index so it adjusts for the shared memory, which has been shifted 1 unit
-  y[i]= s_x[tid + 1+1] + s_x[tid+1] - s_x[tid-1+1];
+  y[i]= -s_x[tid + 1+1] + 2* s_x[tid+1] - s_x[tid-1+1];
 }
 
 void printArray(const float* y, int N) {
