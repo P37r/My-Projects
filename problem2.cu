@@ -71,7 +71,7 @@ __global__ void add(int N, const float *x, float *y){
 
 void printArray(const float* y, int N) {
     std::cout << "[ ";
-    for (int i = 0; i < N; ++i) {
+    for (int i = 0; i < 100; ++i) {
         std::cout << y[i] << ", ";
     }
     std::cout << " ]" << std::endl;
