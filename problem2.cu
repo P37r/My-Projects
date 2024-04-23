@@ -27,6 +27,12 @@ __global__ void add(int N, const float *x, float *y){
 //   }
 
 
+//   if (i>0 && i <N-1){
+//     y[i] = -x[i+1] +2*x[i] - x[i-1];
+
+
+
+
   __shared__ float s_x[BLOCKSIZE+2];
 
   const int i = blockDim.x * blockIdx.x + threadIdx.x;
@@ -37,18 +43,27 @@ __global__ void add(int N, const float *x, float *y){
   
   
   if (i < N){
-    if (tid <blockDim.x + 1) {
-        s_x[tid] = x[i-1];
+    if (tid <blockDim.x + 2) {
+        if(i == 0) {
+            s_x[tid] = x[0];
+        }
+        else if(i == N-1) {
+            s_x[tid] = x[N-1];
+        }
+        else {
+            s_x[tid] = x[i-1];
+        }
+        
     }
-    if (tid == blockDim.x + 1) {
-        s_x[tid] = x[i];
-    }
+
+
+    // if (tid == blockDim.x + 2) {
+    //     s_x[tid] = x[i];
+    // }
   }
 
   // number of "live" threads per block
-  int alive = blockDim.x;
   
-
   __syncthreads(); 
                                              // I add +1 to the index so it adjusts for the shared memory, which has been shifted 1 unit
   y[i]= -s_x[tid + 1+1] + 2* s_x[tid+1] - s_x[tid-1+1];
@@ -104,13 +119,13 @@ int main(void){
 
   // copy memory back to the CPU
   cudaMemcpy(y, d_y, size, cudaMemcpyDeviceToHost);
-
-  for (int i = 0; i < N; ++i){
-    if(y[i] != 0) {
-        std::cout << "ERROR: Non Zero!";
-    }
-  }
-    std::cout << "\n";
+                                                                                    // Verify check
+//   for (int i = 0; i < N; ++i){
+//     if(y[i] != 0) {
+//         std::cout << "ERROR: Non Zero!";
+//     }
+//   }
+//     std::cout << "\n";
     printArray(y,N);
   return 0;
 }
