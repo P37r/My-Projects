@@ -72,11 +72,7 @@ __global__ void add(int N, const float *x, float *y){
 void printArray(const float* y, int N) {
     std::cout << "[ ";
     for (int i = 0; i < N; ++i) {
-        if (i == N - 1) {
-            std::cout << "y[" << i << "]";
-        } else {
-            std::cout << "y[" << i << "], ";
-        }
+        std::cout << y[i] << ", ";
     }
     std::cout << " ]" << std::endl;
 }
