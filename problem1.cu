@@ -123,8 +123,38 @@
 #include <math.h>
 #include <cuda_runtime.h>
 
-#define BLOCKSIZE 256
+#define BLOCKSIZE 128 
 
+
+__global__ void partial_reduction_orig(const int N, float *x_reduced, const float *x){
+  
+  __shared__ float s_x[BLOCKSIZE];
+
+  const int i = blockDim.x * blockIdx.x + threadIdx.x;
+  const int tid = threadIdx.x;
+  
+  // coalesced reads in
+  s_x[tid] = 0.f;
+  if (i < N){
+    s_x[tid] = x[i];
+  }
+
+  // number of "live" threads per block
+  int alive = blockDim.x;
+  
+  while (alive > 1){
+    __syncthreads(); 
+    alive /= 2; // update the number of live threads    
+    if (tid < alive){
+      s_x[tid] += s_x[tid + alive];
+    }
+  }
+
+  // write out once we're done reducing each block
+  if (tid==0){
+    x_reduced[blockIdx.x] = s_x[0];
+  }
+}
 __global__ void partial_reduction(const int N, float *x_reduced, const float *x){
   
   __shared__ float s_x[BLOCKSIZE];
@@ -192,7 +222,7 @@ __global__ void partial_reduction2(const int N, float *x_reduced, const float *x
     
 int main(int argc, char * argv[]){
 
-  int N = 4096;
+  int N = pow(2,22);
   if (argc > 1){
     N = atoi(argv[1]);
   }
@@ -306,6 +336,64 @@ int main(int argc, char * argv[]){
     printf("Time to run kernel 10x: %6.2f ms.\n", time2);
     
     #endif
+
+
+    
+    printf("ORIGINAL VERSION = %f\n");
+
+
+                                                                                        // Version 3
+    // allocate memory and copy to the GPU
+    float * x_reduced3 = new float[numBlocks];  
+
+
+    float * d_x3;
+    float * d_x_reduced3;  
+    cudaMalloc((void **) &d_x3, size_x);
+    cudaMalloc((void **) &d_x_reduced3, size_x_reduced);
+   
+    // copy memory over to the GPU
+    cudaMemcpy(d_x3, x, size_x, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_x_reduced3, x_reduced3, size_x_reduced, cudaMemcpyHostToDevice);
+
+
+    partial_reduction_orig <<< numBlocks, blockSize >>> (N, d_x_reduced3, d_x3);
+
+
+    // copy memory back to the CPU
+    cudaMemcpy(x_reduced3, d_x_reduced3, size_x_reduced, cudaMemcpyDeviceToHost);
+
+
+    float sum_x3 = 0.f;
+    for (int i = 0; i < numBlocks; ++i){
+        sum_x3 += x_reduced3[i];
+    }
+
+
+    //  float target = N * (N+1) / 3.f;
+    printf("error = %f\n", fabs(sum_x3 - target));
+    #if 1
+    int num_trials3 = 10;
+    float time3;
+    cudaEvent_t start3, stop3;
+    cudaEventCreate(&start3);
+    cudaEventCreate(&stop3);
+    cudaEventRecord(start3, 0);
+
+
+    for (int i = 0; i < num_trials3; ++i){
+        partial_reduction_orig <<< numBlocks, blockSize >>> (N, d_x_reduced3, d_x3);
+    }
+
+
+    cudaEventRecord(stop3, 0);
+    cudaEventSynchronize(stop3);
+    cudaEventElapsedTime(&time3, start3, stop3);
+   
+    printf("Time to run kernel 10x: %6.3f ms.\n", time3);
+   
+    #endif
+
 
   return 0;
 }
