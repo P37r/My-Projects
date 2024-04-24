@@ -101,7 +101,7 @@ int main(void){
   // call the add function  
 
                                                             //return here  
-for (int power = 0; power < 19; ++power){
+for (int power = 0; power <=19; ++power){
     int blockSize = pow(2,power);
     
   
