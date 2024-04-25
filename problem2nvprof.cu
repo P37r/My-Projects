@@ -13,37 +13,36 @@ using namespace std::chrono;
 
 __global__ void add(int N, const float *x, float *y, int blocksize){
 
-   extern __shared__ float s_x[]; // shared memory for x
+     extern __shared__ float s_x[]; // shared memory for x
 
-
-  const int i = blockDim.x * blockIdx.x + threadIdx.x;
-  const int tid = threadIdx.x;
-  
-  // coalesced reads in
-  s_x[tid] = 0.f;
-  
-  
-  if (i < N){
-    if (tid <blockDim.x + 2) {
-        if(i == 0) {
-            s_x[tid] = x[0];
-        }
-        else if(i == N-1) {
-            s_x[tid] = x[N-1];
-        }
-        else {
-            s_x[tid] = x[i-1];
-        }
-        
+    const int i = blockDim.x * blockIdx.x + threadIdx.x;
+    const int tid = threadIdx.x;
     
-  }
+    // coalesced reads in
+    s_x[tid + 1] = 0.f; // Adjust the index to account for shared memory shift
+    
+    
+    if (i < N){
+        if (tid < blockDim.x + 2) {
+                if(i == 0) {
+                        s_x[tid + 1] = x[0];
+                }
+                else if(i == N-1) {
+                        s_x[tid + 1] = x[N-1];
+                }
+                else {
+                        s_x[tid + 1] = x[i-1];
+                }
+        }
+    }
 
-  // number of "live" threads per block
-  
-  __syncthreads(); 
-                                             // I add +1 to the index so it adjusts for the shared memory, which has been shifted 1 unit
-  y[i]= -s_x[tid + 1+1] + 2* s_x[tid+1] - s_x[tid-1+1];
-}
+    // number of "live" threads per block
+    
+    __syncthreads(); 
+    
+    if (i < N) {
+        y[i] = -s_x[tid + 2] + 2 * s_x[tid + 1] - s_x[tid]; // Update the calculation of y[i]
+    }
 }
 
 
@@ -89,6 +88,7 @@ int main(void){
   int size = N * sizeof(float);
 
   // allocate memory and copy to the GPU
+
   float * d_x;
   float * d_y;
   cudaMalloc((void **) &d_x, size);
