@@ -78,7 +78,7 @@ void printArray(const float* y, int N) {
 
 int main(void){
 
-  int N = 1e7;
+  int N = 1e6;
   float * x = new float[N];
   float * y = new float[N];
 
@@ -102,7 +102,7 @@ int main(void){
 
                                                             //return here  
 
-    int blockSize = 131072;
+    int blockSize = 64;
     
   
   int numBlocks = (N + blockSize - 1) / blockSize;
