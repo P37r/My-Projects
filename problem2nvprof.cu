@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <math.h>
 #include <cuda_runtime.h>
@@ -11,25 +12,6 @@ using namespace std::chrono;
 
 
 __global__ void add(int N, const float *x, float *y, int blocksize){
-  
-//   int i = blockIdx.x * blockDim.x + threadIdx.x;  
-//   if (i < N-1 && i > 0){
-//     y[i] = -x[i+1] +2*x[i] - x[i-1];
-//   }
-
-//   if (i==0){
-//     y[i] = -x[i+1] +2*x[i] - x[i];
-//   }
-
-//   if (i==N-1){
-//     y[i] = -x[i] +2*x[i] - x[i-1];
-//   }
-
-
-//   if (i>0 && i <N-1){
-//     y[i] = -x[i+1] +2*x[i] - x[i-1];
-
-
 
    extern __shared__ float s_x[]; // shared memory for x
 
@@ -53,12 +35,7 @@ __global__ void add(int N, const float *x, float *y, int blocksize){
             s_x[tid] = x[i-1];
         }
         
-    }
-
-
-    // if (tid == blockDim.x + 2) {
-    //     s_x[tid] = x[i];
-    // }
+    
   }
 
   // number of "live" threads per block
@@ -66,6 +43,7 @@ __global__ void add(int N, const float *x, float *y, int blocksize){
   __syncthreads(); 
                                              // I add +1 to the index so it adjusts for the shared memory, which has been shifted 1 unit
   y[i]= -s_x[tid + 1+1] + 2* s_x[tid+1] - s_x[tid-1+1];
+}
 }
 
 
@@ -100,7 +78,7 @@ void printArray(const float* y, int N) {
 
 int main(void){
 
-  int N = 1e6;
+  int N = 1e7;
   float * x = new float[N];
   float * y = new float[N];
 
@@ -131,10 +109,6 @@ int main(void){
                                                                               // TIMER
   
 
-  
-
-
-//   
     #if 1
 
     float time;                                                                          
@@ -190,8 +164,7 @@ for (int trials = 0; trials < 10; ++trials){
   // copy memory back to the CPU
 #endif
 
-   
-  return 0;
+return 0;
 }
 
 
