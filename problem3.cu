@@ -131,13 +131,15 @@ int main(int argc, char * argv[]){
 for (int version = 1; version <=5; ++version){
     // print out the version 'version'
 
-    printf("Version ", version);
+    // print out the version number
+    printf("Version %d", version);
     printf("\n");
 
     
     for (int power = 9; power <= 12; ++power){
     int N = pow(2,power);
-    printf("N =  ", N);
+    // print out N
+    printf("N = %d", N);
     printf("\n");
 
     
@@ -179,71 +181,70 @@ for (int version = 1; version <=5; ++version){
   dim3 gridDims(numBlocks, numBlocks);
   dim3 blockDims(BLOCKSIZE, BLOCKSIZE);
   
-    int num_trials = 10;
-  for (int trial = 0; trial < num_trials; ++trial) {
-    if (version ==1) {
+int num_trials = 10;
+if (version ==1) {
 
-        #if 1
-        float time;
-        cudaEvent_t start, stop;
-        cudaEventCreate(&start);
-        cudaEventCreate(&stop);
-        cudaEventRecord(start, 0);
+    #if 1
+    float time;
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start, 0);
 
-        for (int i = 0; i < num_trials; ++i){
-            matmul1 <<< gridDims, blockDims >>> (N, d_A, d_B, d_C);
-        }
-
-        cudaEventRecord(stop, 0);
-        cudaEventSynchronize(stop);
-        cudaEventElapsedTime(&time, start, stop);
-        
-        printf("Time to run kernel 10x: %6.2f ms.\n", time);
-        #endif
-
+    for (int i = 0; i < num_trials; ++i){
+        matmul1 <<< gridDims, blockDims >>> (N, d_A, d_B, d_C);
     }
 
-    if (version ==2) {
-        #if 1
-        float time2;
-        cudaEvent_t start2, stop2;
-        cudaEventCreate(&start2);
-        cudaEventCreate(&stop2);
-        cudaEventRecord(start2, 0);
-
-        for (int i = 0; i < num_trials; ++i){
-            matmul2 <<< gridDims, blockDims >>> (N, d_A, d_B, d_C);
-        }
-
-        cudaEventRecord(stop2, 0);
-        cudaEventSynchronize(stop2);
-        cudaEventElapsedTime(&time2, start2, stop2);
-        
-        printf("Time to run kernel 10x: %6.2f ms.\n", time2);
-        #endif
-    }
-
-    if (version ==3) {
-        #if 1
-        float time3;
-        cudaEvent_t start3, stop3;
-        cudaEventCreate(&start3);
-        cudaEventCreate(&stop3);
-        cudaEventRecord(start3, 0);
-
-        for (int i = 0; i < num_trials; ++i){
-            matmul3 <<< gridDims, blockDims >>> (N, d_A, d_B, d_C);
-        }
-
-        cudaEventRecord(stop3, 0);
-        cudaEventSynchronize(stop3);
-        cudaEventElapsedTime(&time3, start3, stop3);
-        
-        printf("Time to run kernel 10x: %6.2f ms.\n", time3);
-        #endif
-    }
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&time, start, stop);
     
-  }
+    printf("Time to run kernel 10x: %6.2f ms.\n", time);
+    #endif
+
+}
+
+if (version ==2) {
+    #if 1
+    float time2;
+    cudaEvent_t start2, stop2;
+    cudaEventCreate(&start2);
+    cudaEventCreate(&stop2);
+    cudaEventRecord(start2, 0);
+
+    for (int i = 0; i < num_trials; ++i){
+        matmul2 <<< gridDims, blockDims >>> (N, d_A, d_B, d_C);
+    }
+
+    cudaEventRecord(stop2, 0);
+    cudaEventSynchronize(stop2);
+    cudaEventElapsedTime(&time2, start2, stop2);
+    
+    printf("Time to run kernel 10x: %6.2f ms.\n", time2);
+    #endif
+}
+
+if (version ==3) {
+    #if 1
+    float time3;
+    cudaEvent_t start3, stop3;
+    cudaEventCreate(&start3);
+    cudaEventCreate(&stop3);
+    cudaEventRecord(start3, 0);
+
+    for (int i = 0; i < num_trials; ++i){
+        matmul3 <<< gridDims, blockDims >>> (N, d_A, d_B, d_C);
+    }
+
+    cudaEventRecord(stop3, 0);
+    cudaEventSynchronize(stop3);
+    cudaEventElapsedTime(&time3, start3, stop3);
+    
+    printf("Time to run kernel 10x: %6.2f ms.\n", time3);
+    #endif
+}
+    
+  
 
 
 //   // copy memory back to the CPU
