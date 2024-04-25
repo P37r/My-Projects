@@ -69,9 +69,6 @@ __global__ void add(int N, const float *x, float *y, int blocksize){
 }
 
 
-
-
-
 __global__ void add2(int N, const float *x, float *y, int blocksize){
   
   int i = blockIdx.x * blockDim.x + threadIdx.x;  
@@ -133,19 +130,30 @@ int main(void){
   int numBlocks = (N + blockSize - 1) / blockSize;
                                                                               // TIMER
   
-   double total_elapsed_time2 = 0;
 
-  for (int trials = 0; trials < 10; ++trials){
-    high_resolution_clock::time_point start2 = high_resolution_clock::now();
-  add2<<<numBlocks, blockSize>>>(N, d_x, d_y,blockSize);
-  high_resolution_clock::time_point end2 = high_resolution_clock::now();
-  duration<double> elapsed2 = end2 - start2;
-  total_elapsed_time2 += elapsed2.count() * 1000; // Convert to milliseconds
+  
 
 
-  }
-  std::cout << "BLOCK SIZE = " << blockSize << "\n";
-  std::cout << "Total Elapsed Time: " << total_elapsed_time2 << " ms\n";
+//   
+
+float time;                                                                          
+  cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start, 0);
+
+
+    for (int trials = 0; trials < 10; ++trials){
+    add2<<<numBlocks, blockSize>>>(N, d_x, d_y,blockSize);
+
+    }
+  
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&time, start, stop);
+   
+    printf("Time to run kernel 10x: %6.3f ms.\n", time);
+// 
     cudaMemcpy(y, d_y, size, cudaMemcpyDeviceToHost);
                                                                                 // Verify check
     for (int i = 0; i < N; ++i){
@@ -156,23 +164,24 @@ int main(void){
     std::cout << "\n";
     
    
+                                 // SECOND VERSION   
+float time2;                                                                          
+cudaEvent_t start2, stop2;
+cudaEventCreate(&start2);
+cudaEventCreate(&stop2);
+cudaEventRecord(start2, 0);
 
-                                                                                    // SECOND VERSION   
-  
-  double total_elapsed_time = 0;
 
-  for (int trials = 0; trials < 10; ++trials){
-    high_resolution_clock::time_point start = high_resolution_clock::now();
+
+for (int trials = 0; trials < 10; ++trials){
   add<<<numBlocks, blockSize>>>(N, d_x, d_y,blockSize);
-  high_resolution_clock::time_point end = high_resolution_clock::now();
-  duration<double> elapsed = end - start;
-  total_elapsed_time += elapsed.count() * 1000; // Convert to milliseconds
-
-
-  }
-  std::cout << "BLOCK SIZE = " << blockSize << "\n";
-  std::cout << "Total Elapsed Time: " << total_elapsed_time << " ms\n";
-
+  }    
+  
+    cudaEventRecord(stop2, 0);
+    cudaEventSynchronize(stop2);
+    cudaEventElapsedTime(&time2, start2, stop2);
+   
+    printf("Time to run kernel 10x: %6.3f ms.\n", time2);
 
   // copy memory back to the CPU
 
