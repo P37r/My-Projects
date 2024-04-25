@@ -135,9 +135,10 @@ int main(void){
 
 
 //   
+    #if 1
 
-float time;                                                                          
-  cudaEvent_t start, stop;
+    float time;                                                                          
+    cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     cudaEventRecord(start, 0);
@@ -153,6 +154,7 @@ float time;
     cudaEventElapsedTime(&time, start, stop);
    
     printf("Time to run kernel 10x: %6.3f ms.\n", time);
+    #endif
 // 
     cudaMemcpy(y, d_y, size, cudaMemcpyDeviceToHost);
                                                                                 // Verify check
@@ -165,6 +167,8 @@ float time;
     
    
                                  // SECOND VERSION   
+#if 1
+
 float time2;                                                                          
 cudaEvent_t start2, stop2;
 cudaEventCreate(&start2);
@@ -184,6 +188,7 @@ for (int trials = 0; trials < 10; ++trials){
     printf("Time to run kernel 10x: %6.3f ms.\n", time2);
 
   // copy memory back to the CPU
+#endif
 
    
   return 0;
