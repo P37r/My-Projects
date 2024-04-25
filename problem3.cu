@@ -181,7 +181,7 @@ for (int version = 1; version <=5; ++version){
   dim3 gridDims(numBlocks, numBlocks);
   dim3 blockDims(BLOCKSIZE, BLOCKSIZE);
   
-int num_trials = 10;
+int num_trials = 1;
 if (version ==1) {
 
     #if 1
