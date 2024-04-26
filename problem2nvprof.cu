@@ -11,40 +11,43 @@
 using namespace std::chrono;
 
 
-__global__ void add(int N, const float *x, float *y, int blocksize){
-
-     extern __shared__ float s_x[]; // shared memory for x
+__global__ void add(int N, const float *x, float *y, int blocksize) {
+    extern __shared__ float s_x[];
 
     const int i = blockDim.x * blockIdx.x + threadIdx.x;
     const int tid = threadIdx.x;
-    
+
     // coalesced reads in
-    s_x[tid + 1] = 0.f; // Adjust the index to account for shared memory shift
-    
-    
-    if (i < N){
-        if (tid < blockDim.x + 2) {
-                if(i == 0) {
-                        s_x[tid + 1] = x[0];
-                }
-                else if(i == N-1) {
-                        s_x[tid + 1] = x[N-1];
-                }
-                else {
-                        s_x[tid + 1] = x[i-1];
-                }
+    s_x[tid] = 0.f;
+
+    if (i < N) {
+        if (tid < blocksize + 2) {
+            if (i == 0) {
+                s_x[tid] = x[0];
+            } else if (i == N - 1) {
+                s_x[tid] = x[N - 1];
+            } else if (i < N) {
+                s_x[tid] = x[i - 1];
+            }
         }
     }
+    
+    __syncthreads();
 
-    // number of "live" threads per block
-    
-    __syncthreads(); 
-    
+    // Compute the difference equation using neighboring elements in shared memory
     if (i < N) {
-        y[i] = -s_x[tid + 2] + 2 * s_x[tid + 1] - s_x[tid]; // Update the calculation of y[i]
+        if (i > 0 && i < N - 1) {
+            y[i] = -s_x[tid + 2] + 2 * s_x[tid + 1] - s_x[tid];
+        } else {
+            // Boundary conditions
+            if (i == 0) {
+                y[i] = 2 * s_x[tid + 1] - s_x[tid];
+            } else if (i == N - 1) {
+                y[i] = -s_x[tid + 2] + 2 * s_x[tid + 1];
+            }
+        }
     }
 }
-
 
 __global__ void add2(int N, const float *x, float *y, int blocksize){
   
@@ -88,7 +91,6 @@ int main(void){
   int size = N * sizeof(float);
 
   // allocate memory and copy to the GPU
-
   float * d_x;
   float * d_y;
   cudaMalloc((void **) &d_x, size);
@@ -102,7 +104,7 @@ int main(void){
 
                                                             //return here  
 
-    int blockSize = 64;
+    int blockSize = 131072;
     
   
   int numBlocks = (N + blockSize - 1) / blockSize;
