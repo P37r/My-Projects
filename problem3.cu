@@ -8,7 +8,7 @@
 
 using namespace std::chrono;
 
-#define BLOCKSIZE 128
+#define BLOCKSIZE 64
 
 __global__ void matmul1(int N, const float *A, const float *B, float *C) {
 
