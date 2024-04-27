@@ -8,7 +8,7 @@
 
 using namespace std::chrono;
 
-#define BLOCKSIZE 128
+#define BLOCKSIZE 32
 
 __global__ void matmul1(int N, const float *A, const float *B, float *C) {
 
@@ -97,7 +97,7 @@ for (int version = 1; version <=3; ++version){
     printf("\n");
 
     
-    for (int power = 9; power <= 9; ++power){
+    for (int power = 9; power <= 12; ++power){
     int N = pow(2,power);
     // print out N
     printf("N = %d", N);
