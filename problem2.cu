@@ -170,30 +170,9 @@ for (int trials = 0; trials < 10; ++trials){
   // copy memory back to the CPU
 #endif
 
+
+
 return 0;
 }
 
 
-// PART 2 
-
-// __global__ void partial_reduction((int N, const float *x, float *y)){
-  
-//   __shared__ float s_x[BLOCKSIZE+2];
-
-//   const int i = blockDim.x * blockIdx.x + threadIdx.x;
-//   const int tid = threadIdx.x;
-  
-//   // coalesced reads in
-//   s_x[tid] = 0.f;
-//   if (i < N){
-//     s_x[tid] = x[i];
-//   }
-
-//   // number of "live" threads per block
-//   int alive = blockDim.x;
-  
-
-//   __syncthreads(); 
-//   y[i]= s_x[tid + 1] + s_x[tid] - s_x[tid-1];
-
-// }
