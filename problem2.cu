@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <math.h>
 #include <cuda_runtime.h>
@@ -12,6 +11,25 @@ using namespace std::chrono;
 
 
 __global__ void add(int N, const float *x, float *y, int blocksize){
+  
+//   int i = blockIdx.x * blockDim.x + threadIdx.x;  
+//   if (i < N-1 && i > 0){
+//     y[i] = -x[i+1] +2*x[i] - x[i-1];
+//   }
+
+//   if (i==0){
+//     y[i] = -x[i+1] +2*x[i] - x[i];
+//   }
+
+//   if (i==N-1){
+//     y[i] = -x[i] +2*x[i] - x[i-1];
+//   }
+
+
+//   if (i>0 && i <N-1){
+//     y[i] = -x[i+1] +2*x[i] - x[i-1];
+
+
 
    extern __shared__ float s_x[]; // shared memory for x
 
@@ -35,22 +53,23 @@ __global__ void add(int N, const float *x, float *y, int blocksize){
             s_x[tid] = x[i-1];
         }
         
-    
+    }
+
+
+    // if (tid == blockDim.x + 2) {
+    //     s_x[tid] = x[i];
+    // }
   }
 
   // number of "live" threads per block
   
   __syncthreads(); 
-  
                                              // I add +1 to the index so it adjusts for the shared memory, which has been shifted 1 unit
-  if (i<N){
-
   y[i]= -s_x[tid + 1+1] + 2* s_x[tid+1] - s_x[tid-1+1];
-
-  }
-
 }
-}
+
+
+
 
 
 __global__ void add2(int N, const float *x, float *y, int blocksize){
@@ -108,34 +127,25 @@ int main(void){
 
                                                             //return here  
 
-    int blockSize = 65536;
+    int blockSize = 131072;
     
   
   int numBlocks = (N + blockSize - 1) / blockSize;
                                                                               // TIMER
   
+   double total_elapsed_time2 = 0;
 
-    #if 1
+  for (int trials = 0; trials < 10; ++trials){
+    high_resolution_clock::time_point start2 = high_resolution_clock::now();
+  add2<<<numBlocks, blockSize>>>(N, d_x, d_y,blockSize);
+  high_resolution_clock::time_point end2 = high_resolution_clock::now();
+  duration<double> elapsed2 = end2 - start2;
+  total_elapsed_time2 += elapsed2.count() * 1000; // Convert to milliseconds
 
-    float time;                                                                          
-    cudaEvent_t start, stop;
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
-    cudaEventRecord(start, 0);
 
-
-    for (int trials = 0; trials < 10; ++trials){
-    add2<<<numBlocks, blockSize>>>(N, d_x, d_y,blockSize);
-
-    }
-  
-    cudaEventRecord(stop, 0);
-    cudaEventSynchronize(stop);
-    cudaEventElapsedTime(&time, start, stop);
-   
-    printf("Time to run kernel 10x: %6.3f ms.\n", time);
-    #endif
-// 
+  }
+  std::cout << "BLOCK SIZE = " << blockSize << "\n";
+  std::cout << "Total Elapsed Time: " << total_elapsed_time2 << " ms\n";
     cudaMemcpy(y, d_y, size, cudaMemcpyDeviceToHost);
                                                                                 // Verify check
     for (int i = 0; i < N; ++i){
@@ -146,33 +156,51 @@ int main(void){
     std::cout << "\n";
     
    
-                                 // SECOND VERSION   
-#if 1
 
-float time2;                                                                          
-cudaEvent_t start2, stop2;
-cudaEventCreate(&start2);
-cudaEventCreate(&stop2);
-cudaEventRecord(start2, 0);
-
-
-
-for (int trials = 0; trials < 10; ++trials){
-  add<<<numBlocks, blockSize>>>(N, d_x, d_y,blockSize);
-  }    
+                                                                                    // SECOND VERSION   
   
-    cudaEventRecord(stop2, 0);
-    cudaEventSynchronize(stop2);
-    cudaEventElapsedTime(&time2, start2, stop2);
-   
-    printf("Time to run kernel 10x: %6.3f ms.\n", time2);
+  double total_elapsed_time = 0;
+
+  for (int trials = 0; trials < 10; ++trials){
+    high_resolution_clock::time_point start = high_resolution_clock::now();
+  add<<<numBlocks, blockSize>>>(N, d_x, d_y,blockSize);
+  high_resolution_clock::time_point end = high_resolution_clock::now();
+  duration<double> elapsed = end - start;
+  total_elapsed_time += elapsed.count() * 1000; // Convert to milliseconds
+
+
+  }
+  std::cout << "BLOCK SIZE = " << blockSize << "\n";
+  std::cout << "Total Elapsed Time: " << total_elapsed_time << " ms\n";
+
 
   // copy memory back to the CPU
-#endif
 
-
-
-return 0;
+   
+  return 0;
 }
 
 
+// PART 2 
+
+// __global__ void partial_reduction((int N, const float *x, float *y)){
+  
+//   __shared__ float s_x[BLOCKSIZE+2];
+
+//   const int i = blockDim.x * blockIdx.x + threadIdx.x;
+//   const int tid = threadIdx.x;
+  
+//   // coalesced reads in
+//   s_x[tid] = 0.f;
+//   if (i < N){
+//     s_x[tid] = x[i];
+//   }
+
+//   // number of "live" threads per block
+//   int alive = blockDim.x;
+  
+
+//   __syncthreads(); 
+//   y[i]= s_x[tid + 1] + s_x[tid] - s_x[tid-1];
+
+// }
