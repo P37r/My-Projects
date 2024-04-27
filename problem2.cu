@@ -127,7 +127,7 @@ int main(void){
 
                                                             //return here  
 
-    int blockSize = 131072;
+    int blockSize = 65536;
     
   
   int numBlocks = (N + blockSize - 1) / blockSize;
